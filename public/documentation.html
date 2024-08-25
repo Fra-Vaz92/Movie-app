@@ -1,17 +1,207 @@
-<!DOCTYPE html>
-<html>
-
-<head>
+<!doctype html>
+<html lang="en">
+  <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>API Documentation</title>
-</head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  </head>
+  <body>
+    <!--Bootstrap Navbar and menu-->
+    <nav class="navbar bg-dark border-bottom border-body" data-bs-theme="dark">
+      <div class="container-fluid">
+        <a class="navbar-brand " href="#">API Documentation</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="documentation.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/Fra-Vaz92/Movie-app">Code</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <p class="container mt-5">The web application will provide users with access to information about different movies, directors, and genres. Users will be able to sign up, update their personal information, and create a list of their favorite movies.</p>
+      <table class="table table-striped">
+        <thead class="-thead-color">
+          <tr>
+            <th scope="col" class="text-center">Business Logic</th>
+            <th scope="col" class="text-center">URL</th>
+            <th scope="col" class="text-center">HTTP Method</th>
+            <th scope="col" class="text-center">Request body data format</th>
+            <th scope="col" class="text-center">Parameters</th>
+            <th scope="col" class="text-center">Response body data format</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!--GET a lsit of movies-->
+          <tr>
+            <td>Get a list of all movies</td>
+            <td>/movies</td>
+            <td>GET</td>
+            <td>none</td>
+            <td>none</td>
+            <td>A JSON object holding data about all the movies</td>
+          </tr>
 
-<body>
-    <h1>API Documentation</h1>
-    <p>The web application will provide users with access to information about different movies, directors, and genres.
-        Users will be able to sign up, update their personal information, and create a list of their favorite movies.
-    </p>
+          <!--GET a single movies-->
+          <tr>
+            <td>Get data about a single movie</td>
+            <td>/movies/:name</td>
+            <td>GET</td>
+            <td>none</td>
+            <td>none</td>
+            <td>A JSON object holding data about a single movie
+              including description, genre, director, image URL.
+              Example: <br />
+              {<br />
+              &nbsp;&nbsp;title: 'Star Wars: Episode 1',<br />
+              &nbsp;&nbsp;description: 'A movie about Jedi and
+              Sith',<br />
+              &nbsp;&nbsp;genre : 'Sci-Fi',<br />
+              &nbsp;&nbsp;director: 'George Lucas',<br />
+              &nbsp;&nbsp;imageUrl: 'https://www.exampleimage.com'<br />}
+            </td>
+          </tr>
+
+          <!--GET movies by genre-->
+          <tr>
+          <td>Get movies data by genre (e.g."War", "Fiction")</td>
+          <td>/genre/:name</td>
+          <td>GET</td>
+          <td>none</td>
+          <td>none</td>
+          <td>Return the movie match with genre.
+            A JSON object holding data about a single movie
+            including description, genre, director, image URL.
+            Example: <br />
+            {<br />
+            &nbsp;&nbsp;name: 'Fiction',<br />
+            &nbsp;&nbsp;description: 'Fiction is the best film genre ever'
+            <br />
+            }
+          </td>
+          </tr>
+          
+          <!--GET a director info-->     
+            <tr>
+              <td>Get data about directors (bio, birth info) by name</td>
+              <td>/directors/:name</td>
+              <td>GET</td>
+              <td>none</td>
+              <td>none</td>
+              <td>Return the movie match with director search. 
+                A JSON object holding data about a director including
+                        bio, birth year and death year. Example: <br />
+                        {<br />
+                        &nbsp;&nbsp;name: 'George Lucas',<br />
+                        &nbsp;&nbsp;bio: 'A talented director and founder of the
+                        best Sci-Fi universe.',<br />
+                        &nbsp;&nbsp;birth year: '05/14/1944',<br />
+                        &nbsp;&nbsp;death year: 'alive'<br />
+                        }
+                </td>
+              </tr>
+              
+          <!--POST a new user--> 
+          <tr>
+            <td>Add a new user to the database</td>
+            <td>/users/register</td>
+            <td>POST</td>
+            <td>none</td>
+            <td>none</td>
+            <td> A JSON object holding data about a new user (username,
+              email, password). Example: <br />
+              {<br />
+              &nbsp;&nbsp;username: 'John Snow',<br />
+              &nbsp;&nbsp;email: 'Jsnow@gmail.com',<br />
+              &nbsp;&nbsp;password: '*****'<br />
+              <p>A confirmation or an error message based on the call result</p>
+              }
+            </td>
+          </tr>
+
+            <!--PUT a username--> 
+            <tr>
+            <td>Allow users to change demo/username</td>
+            <td>/users/:username</td>
+            <td>PUT</td>
+            <td>none</td>
+            <td>none</td>
+            <td>A JSON object holding data about username. Example:
+              &nbsp;&nbsp;username: 'JohnSnow' <br />
+              {<br />
+              &nbsp;&nbsp;username: 'JohnSnow',<br />
+              &nbsp;&nbsp;email: 'Jsnow@gmail.com',<br />
+              &nbsp;&nbsp;password: '*****'<br />}</td>
+              </tr>
+            
+            <!--POST a username-->   
+            <tr>
+              <td>Allow users to add movies in to their favorite movie list</td>
+              <td>/users/:username/:favorites</td>
+              <td>POST</td>
+              <td>none</td>
+              <td>none</td>
+              <td>
+                    {<br />
+                        &nbsp;&nbsp;title: 'Tolkien's Lord of the Rings '<br />
+                    }
+                    <p>A confirmation or an error message.</p>
+                    </td>
+              </tr>
+
+            <!--DELETE movies from a list of favorite-->  
+            <tr>
+              <td>Allow users to delete movies from their favorite movie list</td>
+              <td>/users/:username/:favorites/:movieTitles</td>
+              <td>DELETE</td>
+              <td>none</td>
+              <td>none</td>
+              <td>A text message indicating whether the movie was successfully deleted</td>
+            </tr>
+
+            <!--DELETE an existing user-->      
+            <tr>
+                  <td>Allow existing users to deregister</td>
+                  <td>/users/:username/</td>
+                  <td>DELETE</td>
+                  <td>none</td>
+                  <td>username (URL parameter)</td>
+                  <td>A confirmation or an error message about the deregistration of the user</td>
+              </tr>
+        </tbody>
+      </table>
+      <h2 class="mt-5">Programming Languages</h2>
+      <ul class="list-group">
+        <li class="list-group-item">HTML</li>
+        <li class="list-group-item">CSS</li>
+        <li class="list-group-item">JavaScript</li>
+        <li class="list-group-item">NodeJS</li>
+        <li class="list-group-item">React</li>
+      </ul>
+      <nav class="mt-5">
+          <h3>Essential Features</h3>
+          <ul class="list-group">
+            <li class="list-group-item">Return a list of ALL movies to the user</li>
+            <li class="list-group-item">Return data (description, genre, director, image URL, whether it’s featured or not) about a
+              single movie by title to the user</li>
+            <li class="list-group-item">Return data about a genre (description) by name/title (e.g., “Thriller”)</li>
+            <li class="list-group-item">Return data about a director (bio, birth year, death year) by name</li>
+            <li class="list-group-item">Allow new users to register</li>
+            <li class="list-group-item">Allow users to update their user info (username, password, email, date of birth)</li>
+            <li class="list-group-item">Allow users to add a movie to their list of favorites</li>
+            <li class="list-group-item">Allow users to remove a movie from their list of favorites</li>
+            <li class="list-group-item">Allow existing users to deregister</li>
+          </ul>
+       </nav>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
 </body>
-
 </html>
