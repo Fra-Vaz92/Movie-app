@@ -2,9 +2,9 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const morgan = require('morgan');
 const path = require('path');
-const uuid = require('uuid');
 const mongoose = require('mongoose');
 const Models = require('./models.js');
+
 
 const Movies = Models.Movie;
 const Users = Models.User;
@@ -19,10 +19,18 @@ mongoose.connect('mongodb://localhost:27017/myFlixDB', { useNewUrlParser: true, 
 app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
+
 
 
 //Morgan Middleware function to log all requests
 app.use(morgan('combined'));
+
+//Passport Middleware function to authentication
+let auth = require('./auth')(app);
+const passport = require('passport');
+require('./passport');
+
 
 //GET request for a plain text answer
 app.get('/', (req, res) => {
@@ -34,7 +42,7 @@ app.get('/', (req, res) => {
 app.use(express.static('public'));
 
 //READ/GET all movies route located to "/" as endpoint
-app.get('/movies', async (req,res) => {
+app.get('/movies', passport.authenticate('jwt', {session: false}), async (req,res) => {
   await Movies.find()
   .then((movies) => {res.json(movies);
 
@@ -47,7 +55,7 @@ app.get('/movies', async (req,res) => {
 
 
 //READ/GET movies Title
-app.get('/movies/:Title', async (req, res) => {
+app.get('/movies/:Title', passport.authenticate('jwt', { session: false }), async (req, res) => {
   await Movies.findOne({ Title: req.params.Title })
       .then((movie) => {
           if (movie) {
@@ -67,7 +75,7 @@ app.get('/movies/:Title', async (req, res) => {
 });
 
 //READ/GET all genre route located to "/" as endpoint
-app.get('/genres', async (req,res) => {
+app.get('/genres', passport.authenticate('jwt', { session: false }), async (req,res) => {
   await Movies.find()
   .then((genre) => {res.json(genre);
 
@@ -79,7 +87,7 @@ app.get('/genres', async (req,res) => {
 });
 
 //READ/GET movies by genre
-app.get('/genres/:Name', async (req, res) => {
+app.get('/genres/:Name', passport.authenticate('jwt', { session: false }), async (req, res) => {
   await Movies.findOne({ 'Name': req.params.Name})
       .then((genre) => {
           if (genre) {
@@ -98,7 +106,7 @@ app.get('/genres/:Name', async (req, res) => {
 
 
 //READ/GET director's name
-app.get('/directors/:name', async (req, res) => {
+app.get('/directors/:name', passport.authenticate('jwt', { session: false }), async (req, res) => {
   await Movies.findOne({ 'Director.Name': req.params.name })
       .then((director) => {
           if (director) {
@@ -118,7 +126,7 @@ app.get('/directors/:name', async (req, res) => {
 });
 
 //DELETE movie from favoirte list
-app.delete('/users/:Username/favorites/:movieID', async (req, res) => {
+app.delete('/users/:Username/favorites/:movieID', passport.authenticate('jwt', { session: false }), async (req, res) => {
   await Users.findOneAndUpdate(
       {
           Username: req.params.Username,
@@ -170,7 +178,7 @@ app.post('/users/register', async (req, res) => {
 });
  
 // READ/GET all users in the list
-app.get('/users', async (req, res) => {
+app.get('/users', passport.authenticate('jwt', { session: false }), async (req, res) => {
   await Users.find()
       .then((users) => {
           res.json(users);
@@ -183,7 +191,7 @@ app.get('/users', async (req, res) => {
 
 
 //READ/GET users by username
-app.get('/users/:Username', async(req,res) => {
+app.get('/users/:Username', passport.authenticate('jwt', { session: false }), async(req,res) => {
   await Users.findOne({Username: req.params.Username})
   .then((user) => {
     if (user) {
@@ -200,7 +208,12 @@ app.get('/users/:Username', async(req,res) => {
 
 
 //UPDATE username
-app.put('/users/:Username', async (req, res) => {
+app.put('/users/:Username',passport.authenticate('jwt', { session: false }), async (req, res) => {
+
+     // CONDITION TO CHECK ADDED HERE
+     if(req.user.Username !== req.params.Username){
+        return res.status(400).send('Permission denied');
+    }
  await Users.findOneAndUpdate({Username:req.params.Username},
   {
     $set: {
@@ -223,7 +236,7 @@ app.put('/users/:Username', async (req, res) => {
 });
 
 //CREATE favorite list
-app.post('/users/:Username/favorites',  async (req, res) => {
+app.post('/users/:Username/favorites', passport.authenticate('jwt', { session: false }), async (req, res) => {
   await Users.findOneAndUpdate(
       { Username: req.params.Username },
       {
@@ -242,7 +255,7 @@ app.post('/users/:Username/favorites',  async (req, res) => {
 
 
 //DELETE Movie title from a list
-app.delete('/users/:Username/favorites/:movieTitle', async (req, res) => {
+app.delete('/users/:Username/favorites/:movieTitle', passport.authenticate('jwt', { session: false }), async (req, res) => {
   await Users.findOneAndUpdate(
       {
           Username: req.params.Username,
@@ -264,7 +277,7 @@ app.delete('/users/:Username/favorites/:movieTitle', async (req, res) => {
 
 
 //DELETE an existing user
-app.delete('/users/:Username', async (req, res) => {
+app.delete('/users/:Username', passport.authenticate('jwt', { session: false }), async (req, res) => {
   await Users.findOneAndDelete({ Username: req.params.Username })
       .then((user) => {
           if (!user) {
