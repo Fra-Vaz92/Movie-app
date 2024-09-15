@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const path = require('path');
 const mongoose = require('mongoose');
 const Models = require('./models.js');
+const { check, validationResult } = require('express-validator');
 
 
 const Movies = Models.Movie;
@@ -21,7 +22,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
+//CORS installation
+const cors = require('cors');
+app.use(cors());
 
 //Morgan Middleware function to log all requests
 app.use(morgan('combined'));
@@ -148,7 +151,20 @@ app.delete('/users/:Username/favorites/:movieID', passport.authenticate('jwt', {
 
 
 //CREATE new user
-app.post('/users/register', async (req, res) => {
+app.post('/users/register',
+    [
+        check('Username', 'Username is required').isLength({min:5}),
+        check('Username', 'Username contains non alphanumeric characters - n ot allowed.').isAlphanumeric(),
+        check('Password', 'Password is required').not().isEmpty(),
+        check('Email', 'Email does not appear to be valid.').isEmail(),
+    ], 
+    
+    async (req, res) => {
+let errors = validationResult(req);        
+    if(!errors.isEmpty()) {
+        return res.status(422).json({errors:errors.array()});
+    }
+let hashedPassword = Users.hashPassword(req.body.Password);
   await Users.findOne({ Username: req.body.Username })
       .then((user) => {
           if (user) {
@@ -158,7 +174,7 @@ app.post('/users/register', async (req, res) => {
           } else {
               Users.create({
                   Username: req.body.Username,
-                  Password: req.body.Password,
+                  Password: hashedPassword,
                   Email: req.body.Email,
                   Birthday: req.body.Birthday,
               })
@@ -300,6 +316,7 @@ app.delete('/users/:Username', passport.authenticate('jwt', { session: false }),
 });
 
 //function for the server
-app.listen(8080, () => {
-    console.log('Your app is listening on port 8080.');
-  });
+const port = process.env.PORT || 8080;
+app.listen(port, '0.0.0.0',() => {
+ console.log('Listening on Port' + port);
+});
