@@ -6,8 +6,6 @@ const mongoose = require('mongoose');
 const Models = require('./models.js');
 const { check, validationResult } = require('express-validator');
 
-require('dotenv').config();
-
 
 const Movies = Models.Movie;
 const Users = Models.User;
@@ -23,10 +21,7 @@ const app = express();
 //mongoose.connect('mongodb://localhost:27017/myFlixDB', { useNewUrlParser: true, useUnifiedTopology: true });
 
 //function to connect mongoose to the database in Atlas through Heroku
-mongoose.connect(process.env.MONGODB_URI,{ useNewUrlParser: true, useUnifiedTopology: true })
-
-.then((x) => console.log('Connected to the DB')
-.catch(err => console.error('Error while connecting to DB', err)));
+mongoose.connect(process.env.MONGODB_URI,{ useNewUrlParser: true, useUnifiedTopology: true });
 
 
 app.use(express.static('public'));
