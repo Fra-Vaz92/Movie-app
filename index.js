@@ -14,8 +14,12 @@ const Directors = Models.Director;
 
 const app = express();
 
-//function to connect mongoose to the database
-mongoose.connect('mongodb://localhost:27017/myFlixDB', { useNewUrlParser: true, useUnifiedTopology: true });
+//function to connect mongoose to the local database
+//mongoose.connect('mongodb://localhost:27017/myFlixDB', { useNewUrlParser: true, useUnifiedTopology: true });
+
+//function to connect mongoose to the database in Atlas through Heroku
+mongoose.connect('process.env.CONNECTION_URI',{ useNewUrlParser: true, useUnifiedTopology: true });
+
 
 app.use(express.static('public'));
 app.use(express.json());
