@@ -6,6 +6,8 @@ const mongoose = require('mongoose');
 const Models = require('./models.js');
 const { check, validationResult } = require('express-validator');
 
+require('dotenv').config();
+
 
 const Movies = Models.Movie;
 const Users = Models.User;
@@ -14,11 +16,17 @@ const Directors = Models.Director;
 
 const app = express();
 
+//connection to Atlas
+//mongoose.connect('mongodb+srv://infomarkethod:v5Mj2c2Ow36UGdSU@mydatabase.xkdtu.mongodb.net/myFlixDB?retryWrites=true&w=majority&appName=MyDatabase');
+
 //function to connect mongoose to the local database
 //mongoose.connect('mongodb://localhost:27017/myFlixDB', { useNewUrlParser: true, useUnifiedTopology: true });
 
 //function to connect mongoose to the database in Atlas through Heroku
-mongoose.connect('process.env.CONNECTION_URI',{ useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(process.env.MONGODB_URI,{ useNewUrlParser: true, useUnifiedTopology: true })
+
+.then((x) => console.log('Connected to the DB')
+.catch(err => console.error('Error while connecting to DB', err)));
 
 
 app.use(express.static('public'));
@@ -319,7 +327,7 @@ app.delete('/users/:Username', passport.authenticate('jwt', { session: false }),
     res.status(500).send('Something was broke!');
 });
 
-//function for the server
+//function for the server Heroku
 const port = process.env.PORT || 8080;
 app.listen(port, '0.0.0.0',() => {
  console.log('Listening on Port' + port);
