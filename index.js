@@ -2,6 +2,7 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const morgan = require('morgan');
 const path = require('path');
+cors = require ('cors');
 const mongoose = require('mongoose');
 const Models = require('./models.js');
 const { check, validationResult } = require('express-validator');
@@ -13,30 +14,36 @@ const Genres = Models.Genre;
 const Directors = Models.Director; 
 
 const app = express();
-
-//connection to Atlas
-//mongoose.connect('mongodb+srv://infomarkethod:v5Mj2c2Ow36UGdSU@mydatabase.xkdtu.mongodb.net/myFlixDB?retryWrites=true&w=majority&appName=MyDatabase');
-
-//function to connect mongoose to the local database
-//mongoose.connect('mongodb://localhost:27017/myFlixDB', { useNewUrlParser: true, useUnifiedTopology: true });
-
-//function to connect mongoose to the database in Atlas through Heroku
-mongoose.connect(process.env.MONGODB_URI,{ useNewUrlParser: true, useUnifiedTopology: true });
+const { check, validationResult } = require('express-validator');
 
 
 app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
-
-//CORS installation
-const cors = require('cors');
 app.use(cors());
+
+
+let allowedOrigins = ['http://localhost:8080', 'https://movie-app-47zy.onrender.com', 'http://localhost:1234'];
+
+//CORS
+const cors = require('cors');
+app.use(cors({
+    origin: (origin, callback) => {
+        if(!origin) return callback(null, true);
+        if(allowedOrigins.indexOf(origin) === -1){
+            let message = 'The CORS policy for this application doesn\'t allow access from origin' + origin;
+            return callback(new Error(message ), false);
+        }
+        return callback(null, true);
+    }
+}));
+
 
 //Morgan Middleware function to log all requests
 app.use(morgan('combined'));
 
-//Passport Middleware function to authentication
+//Passport Middleware function to authentication, must be after bodyParser
 let auth = require('./auth')(app);
 const passport = require('passport');
 require('./passport');
@@ -49,7 +56,14 @@ app.get('/', (req, res) => {
 
 
 //GET documentation file
-app.use(express.static('public'));
+app.use('/documentation',express.static('public'));
+
+
+mongoose.connect( process.env.CONNECTION_URI, { 
+    useNewUrlParser: true, useUnifiedTopology: true })
+    .catch(error => handleError(error));
+
+
 
 //READ/GET all movies route located to "/" as endpoint
 app.get('/movies', passport.authenticate('jwt', { session: false }), async (req,res) => {
