@@ -333,7 +333,7 @@ app.delete('/users/:Username', passport.authenticate('jwt', { session: false }),
     res.status(500).send('Something was broke!');
 });
 
-//function for the server Heroku
+//function for the server
 const port = process.env.PORT || 8080;
 app.listen(port, '0.0.0.0',() => {
  console.log('Listening on Port' + port);
