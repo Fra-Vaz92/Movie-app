@@ -2,7 +2,6 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const morgan = require('morgan');
 const path = require('path');
-cors = require ('cors');
 const mongoose = require('mongoose');
 const Models = require('./models.js');
 
