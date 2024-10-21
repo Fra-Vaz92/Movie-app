@@ -2,20 +2,23 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const morgan = require('morgan');
 const path = require('path');
-const cors = require('cors');
-const app = express();
-
 const mongoose = require('mongoose');
 const Models = require('./models.js');
+
 
 const Movies = Models.Movie;
 const Users = Models.User;
 const Genres = Models.Genre;
 const Directors = Models.Director; 
 
-mongoose.connect( process.env.CONNECTION_URI, { 
-    useNewUrlParser: true, useUnifiedTopology: true })
-    .catch(error => handleError(error));
+const app = express();
+const { check, validationResult } = require('express-validator');
+
+
+app.use(express.static('public'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 
 let allowedOrigins = ['http://localhost:8080', 'https://movie-app-47zy.onrender.com', 'http://localhost:1234'];
@@ -41,11 +44,6 @@ let auth = require('./auth')(app);
 const passport = require('passport');
 require('./passport');
 
-app.use(express.static('public'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(bodyParser.urlencoded({ extended: true }));
-
 
 //GET request for a plain text answer
 app.get('/', (req, res) => {
@@ -55,6 +53,11 @@ app.get('/', (req, res) => {
 
 //GET documentation file
 app.use('/documentation',express.static('public'));
+
+
+mongoose.connect( process.env.CONNECTION_URI, { 
+    useNewUrlParser: true, useUnifiedTopology: true })
+    .catch(error => handleError(error));
 
 
 
