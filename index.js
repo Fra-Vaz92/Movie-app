@@ -24,14 +24,14 @@ let allowedOrigins = ['http://localhost:8080', 'https://movie-app-47zy.onrender.
 //CORS
 app.use(cors({
     origin: (origin, callback) => {
-        if(!origin) return callback(null, true);
-        if(allowedOrigins.indexOf(origin) === -1){
-            let message = 'The CORS policy for this application doesn\'t allow access from origin' + origin;
-            return callback(new Error(message ), false);
-        }
+      console.log('Origin:', origin); // debug the origin
+      if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
+      } else {
+        return callback(new Error('Not allowed by CORS'), false);
+      }
     }
-}));
+  }));
 
 
 //Morgan Middleware function to log all requests
