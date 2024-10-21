@@ -13,7 +13,6 @@ const Users = Models.User;
 const Genres = Models.Genre;
 const Directors = Models.Director; 
 
-require('dotenv').config();
 mongoose.connect( process.env.CONNECTION_URI, { 
     useNewUrlParser: true, useUnifiedTopology: true })
     .catch(error => handleError(error));
