@@ -24,6 +24,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 let allowedOrigins = ['http://localhost:8080', 'https://movie-app-47zy.onrender.com', 'http://localhost:1234'];
 
 //CORS
+const cors = require('cors');
 app.use(cors({
     origin: (origin, callback) => {
       console.log('Origin:', origin); // debug the origin
