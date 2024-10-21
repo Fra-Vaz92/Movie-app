@@ -191,7 +191,6 @@ let hashedPassword = Users.hashPassword(req.body.Password);
                   .send(req.body.Username + ' already exists;');
           } else {
               Users.create({
-                  name: req.body.name,
                   Username: req.body.Username,
                   Password: hashedPassword,
                   Email: req.body.Email,
