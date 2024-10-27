@@ -8,6 +8,8 @@ const Models = require('./models.js');
 
 const Movies = Models.Movie;
 const Users = Models.User;
+const Genres = Models.Genre;
+const Directors = Models.Director; 
 
 const app = express();
 const { check, validationResult } = require('express-validator');
@@ -35,33 +37,6 @@ app.use(cors({
   }));
 
 
-
-  mongoose.connect( process.env.CONNECTION_URI, { 
-    useNewUrlParser: true, useUnifiedTopology: true })
-    .catch(error => handleError(error));
-
-
-  module.exports = (router) => {
-	router.post('/login', (req, res) => {
-		passport.authenticate('local', { session: false }, (error, user, info) => {
-			if (error || !user) {
-				return res.status(400).json({
-					message: 'Something is not right',
-					user: user,
-				});
-			}
-			req.login(user, { session: false }, (error) => {
-				if (error) {
-					res.send(error);
-				}
-				let token = generateJWTToken(user.toJSON());
-				return res.json({ user, token });
-			});
-		})(req, res);
-	});
-};
-
-
 //Morgan Middleware function to log all requests
 app.use(morgan('combined'));
 
@@ -79,6 +54,11 @@ app.get('/', (req, res) => {
 
 //GET documentation file
 app.use('/documentation',express.static('public'));
+
+
+mongoose.connect( process.env.CONNECTION_URI, { 
+    useNewUrlParser: true, useUnifiedTopology: true })
+    .catch(error => handleError(error));
 
 
 
