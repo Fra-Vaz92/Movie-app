@@ -36,9 +36,9 @@ app.use(cors({
 
 
 
-  mongoose.connect('mongodb+srv://infomarkethod:v5Mj2c2Ow36UGdSU@mydatabase.xkdtu.mongodb.net/?retryWrites=true&w=majority&appName=MyDatabase',
-    { 
-    useNewUrlParser: true, useUnifiedTopology: true, });
+  mongoose.connect( process.env.CONNECTION_URI, { 
+    useNewUrlParser: true, useUnifiedTopology: true })
+    .catch(error => handleError(error));
 
 
   module.exports = (router) => {
