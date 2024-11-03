@@ -290,7 +290,7 @@ app.post('/users/:Username/movies/:movieId', passport.authenticate('jwt', { sess
 
 
 //DELETE Movie title from a list
-app.delete('/users/:Username/favorites/:movieTitle', passport.authenticate('jwt', { session: false }), async (req, res) => {
+app.delete('/users/:Username/movies/:movieId', passport.authenticate('jwt', { session: false }), async (req, res) => {
   await Users.findOneAndUpdate(
       {
           Username: req.params.Username,
