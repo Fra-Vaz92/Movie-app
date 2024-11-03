@@ -275,7 +275,7 @@ app.post('/users/:Username/favorites', passport.authenticate('jwt', { session: f
   await Users.findOneAndUpdate(
       { Username: req.params.Username },
       {
-          $push: { FavoriteMovies: req.body.FavoriteMovies },
+          $push: { FavoriteMovies: req.body.movieId },
       },
       { new: true }
   )
@@ -294,10 +294,10 @@ app.delete('/users/:Username/favorites/:movieTitle', passport.authenticate('jwt'
   await Users.findOneAndUpdate(
       {
           Username: req.params.Username,
-          FavoriteMovies: req.params.movieID,
+          FavoriteMovies: req.params.movieId,
       },
       {
-          $pull: { FavoriteMovies: req.params.movieID },
+          $pull: { FavoriteMovies: req.params.movieId },
       },
       { new: true }
   )
