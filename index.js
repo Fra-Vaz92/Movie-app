@@ -148,7 +148,7 @@ app.get('/directors/:name', passport.authenticate('jwt', { session: false }), as
 
 //DELETE movie from favoirte list
 app.delete('/users/:Username/movies/:movieId', passport.authenticate('jwt', { session: false }), async (req, res) => {
-    const movieId = mongoose.Types.ObjectId(req.params.movieId);
+    const movieId = new mongoose.Types.ObjectId(req.params.movieId);
   await Users.findOneAndUpdate(
       {
           Username: req.params.Username,
@@ -273,7 +273,7 @@ app.put('/users/:Username',passport.authenticate('jwt', { session: false }), asy
 
 //CREATE favorite list
 app.post('/users/:Username/movies/:movieId', passport.authenticate('jwt', { session: false }), async (req, res) => {
-    const movieId = mongoose.Types.ObjectId(req.params.movieId);
+    const movieId = new mongoose.Types.ObjectId(req.params.movieId);
   await Users.findOneAndUpdate(
       { Username: req.params.Username },
       {
