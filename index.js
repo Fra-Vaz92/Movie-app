@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const path = require('path');
 const mongoose = require('mongoose');
 const Models = require('./models.js');
+const { check, validationResult } = require('express-validator');
 
 
 const Movies = Models.Movie;
@@ -12,7 +13,15 @@ const Genres = Models.Genre;
 const Directors = Models.Director; 
 
 const app = express();
-const { check, validationResult } = require('express-validator');
+
+//connection to Atlas
+//mongoose.connect('mongodb+srv://infomarkethod:v5Mj2c2Ow36UGdSU@mydatabase.xkdtu.mongodb.net/myFlixDB?retryWrites=true&w=majority&appName=MyDatabase');
+
+//function to connect mongoose to the local database
+//mongoose.connect('mongodb://localhost:27017/myFlixDB', { useNewUrlParser: true, useUnifiedTopology: true });
+
+//function to connect mongoose to the database in Atlas through Heroku
+mongoose.connect(process.env.MONGODB_URI,{ useNewUrlParser: true, useUnifiedTopology: true });
 
 
 app.use(express.static('public'));
@@ -20,27 +29,28 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
-let allowedOrigins = ['http://localhost:8080', 'https://movie-app-47zy.onrender.com', 'http://localhost:1234', 'https://app-for-movie.netlify.app', 'http://localhost:4200'];
-
-//CORS
+//CORS installation
 const cors = require('cors');
-app.use(cors({
-    origin: (origin, callback) => {
-      console.log('Origin:', origin); // debug the origin
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      } else {
-        return callback(new Error('Not allowed by CORS'), false);
-      }
-    }
-  }));
+const allowedOrigins = ['http://localhost:4200', 'http://localhost:8080', 'http://localhost:1234', 'https://fra-va92.github.io', 'https://app-for-movie.netlify.app/' ]; // Add allowed origins here
 
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed methods
+    credentials: true, // Allow credentials (e.g., cookies)
+  })
+);
 
 //Morgan Middleware function to log all requests
 app.use(morgan('combined'));
 
-//Passport Middleware function to authentication, must be after bodyParser
+//Passport Middleware function to authentication
 let auth = require('./auth')(app);
 const passport = require('passport');
 require('./passport');
@@ -53,14 +63,7 @@ app.get('/', (req, res) => {
 
 
 //GET documentation file
-app.use('/documentation',express.static('public'));
-
-
-mongoose.connect( process.env.CONNECTION_URI, { 
-    useNewUrlParser: true, useUnifiedTopology: true })
-    .catch(error => handleError(error));
-
-
+app.use(express.static('public'));
 
 //READ/GET all movies route located to "/" as endpoint
 app.get('/movies', passport.authenticate('jwt', { session: false }), async (req,res) => {
@@ -147,14 +150,14 @@ app.get('/directors/:name', passport.authenticate('jwt', { session: false }), as
 });
 
 //DELETE movie from favoirte list
-app.delete('/users/:Username/movies/:movieId', passport.authenticate('jwt', { session: false }), async (req, res) => {
+app.delete('/users/:Username/favorites/:movieID', passport.authenticate('jwt', { session: false }), async (req, res) => {
   await Users.findOneAndUpdate(
       {
           Username: req.params.Username,
-          FavoriteMovies: req.params.movieId,
+          FavoriteMovies: req.params.movieID,
       },
       {
-          $pull: { FavoriteMovies: req.params.movieId },
+          $pull: { FavoriteMovies: req.params.movieID },
       },
       { new: true }
   )
@@ -172,7 +175,7 @@ app.delete('/users/:Username/movies/:movieId', passport.authenticate('jwt', { se
 app.post('/users/register',
     [
         check('Username', 'Username is required').isLength({min:5}),
-        check('Username', 'Username contains non alphanumeric characters - not allowed.').isAlphanumeric(),
+        check('Username', 'Username contains non alphanumeric characters - n ot allowed.').isAlphanumeric(),
         check('Password', 'Password is required').not().isEmpty(),
         check('Email', 'Email does not appear to be valid.').isEmail(),
     ], 
@@ -251,7 +254,6 @@ app.put('/users/:Username',passport.authenticate('jwt', { session: false }), asy
  await Users.findOneAndUpdate({Username:req.params.Username},
   {
     $set: {
-      name: req.body.name,
       Username: req.body.Username,
       Password: req.body.Password,
       Email: req.body.Email,
@@ -271,12 +273,10 @@ app.put('/users/:Username',passport.authenticate('jwt', { session: false }), asy
 });
 
 //CREATE favorite list
-app.post('/users/:Username/movies/:movieId', passport.authenticate('jwt', { session: false }), async (req, res) => {
+app.post('/users/:Username/favorites/:movieID', passport.authenticate('jwt', { session: false }), async (req, res) => {
   await Users.findOneAndUpdate(
       { Username: req.params.Username },
-      {
-          $push: { FavoriteMovies: req.params.movieId },
-      },
+      { $addToSet: { FavoriteMovies: req.params.movieID } }, // Use $addToSet to avoid duplicates,
       { new: true }
   )
       .then((updatedUser) => {
@@ -290,14 +290,14 @@ app.post('/users/:Username/movies/:movieId', passport.authenticate('jwt', { sess
 
 
 //DELETE Movie title from a list
-app.delete('/users/:Username/movies/:movieTitle', passport.authenticate('jwt', { session: false }), async (req, res) => {
+app.delete('/users/:Username/favorites/:movieTitle', passport.authenticate('jwt', { session: false }), async (req, res) => {
   await Users.findOneAndUpdate(
       {
           Username: req.params.Username,
-          FavoriteMovies: req.params.movieTitle,
+          FavoriteMovies: req.params.movieID,
       },
       {
-          $pull: { FavoriteMovies: req.params.movieTitle },
+          $pull: { FavoriteMovies: req.params.movieID },
       },
       { new: true }
   )
@@ -334,7 +334,7 @@ app.delete('/users/:Username', passport.authenticate('jwt', { session: false }),
     res.status(500).send('Something was broke!');
 });
 
-//function for the server
+//function for the server Heroku
 const port = process.env.PORT || 8080;
 app.listen(port, '0.0.0.0',() => {
  console.log('Listening on Port' + port);
