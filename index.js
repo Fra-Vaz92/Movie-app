@@ -274,6 +274,14 @@ app.put('/users/:Username',passport.authenticate('jwt', { session: false }), asy
 
 //CREATE favorite list
 app.post('/users/:Username/favorites/:movieID', passport.authenticate('jwt', { session: false }), async (req, res) => {
+        if (req.user.Username !== req.params.Username) {
+        return res.status(403).send('Permission denied');
+    }
+
+    const movieExists = await Movies.findById(req.params.movieID);
+    if (!movieExists) {
+        return res.status(404).send('Movie not found');
+    }
   await Users.findOneAndUpdate(
       { Username: req.params.Username },
       { $addToSet: { FavoriteMovies: req.params.movieID } }, // Use $addToSet to avoid duplicates,
@@ -289,9 +297,13 @@ app.post('/users/:Username/favorites/:movieID', passport.authenticate('jwt', { s
 });
 
 
-//DELETE Movie title from a list
-app.delete('/users/:Username/favorites/:movieTitle', passport.authenticate('jwt', { session: false }), async (req, res) => {
-  await Users.findOneAndUpdate(
+//DELETE Movie from a list
+app.delete('/users/:Username/favorites/:movieID', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    if (req.user.Username !== req.params.Username) {
+        return res.status(403).send('Permission denied');
+    }
+    
+    await Users.findOneAndUpdate(
       {
           Username: req.params.Username,
           FavoriteMovies: req.params.movieID,
