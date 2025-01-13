@@ -55,6 +55,8 @@ let auth = require('./auth')(app);
 const passport = require('passport');
 require('./passport');
 
+// Serve static files from the 'public' folder
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 //GET request for a plain text answer
 app.get('/', (req, res) => {
