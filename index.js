@@ -31,7 +31,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 //CORS installation
 const cors = require('cors');
-const allowedOrigins = ['http://localhost:4200', 'http://localhost:8080', 'http://localhost:1234', 'https://fra-vaz92.github.io', 'https://app-for-movie.netlify.app/' ]; // Add allowed origins here
+const allowedOrigins = ['http://localhost:4200', 'http://localhost:8080', 'http://localhost:1234', 'https://fra-vaz92.github.io', 'https://app-for-movie.netlify.app' ]; // Add allowed origins here
 
 app.use(
   cors({
